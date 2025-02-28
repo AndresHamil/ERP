@@ -1,6 +1,9 @@
 // ----------------------------------------------------- [ IMPORTACIONES ]
 import express from "express";
 import * as rutes from "./routes/index.js";
+import {
+    PORT
+} from './config.js';
 // ----------------------------------------------------- [ LIBRERIAS]
 const app = express()
 app.use(express.json())
@@ -16,5 +19,5 @@ app.use(rutes.usuariosRouter)
 // --- [ OTROS ]
 app.use(rutes.sesionesRouter)
 // ----------------------------------------------------- [ SALIDA DE CONSOLA ]
-app.listen(3000) 
-console.log("Running server on port: 3000")
+app.listen(PORT) 
+console.log("Running server on port: ", PORT)
