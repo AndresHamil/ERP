@@ -1,7 +1,14 @@
 import { pool } from "../../../db.js";
 
 export const consultarUsuariosFormulario = async (req, res) => {
-    const { nombre } = req.body;
+    const { 
+        nombre,
+        fkSucursalId,
+        fkDepartamentoId,
+        fkPerfilId
+    } = req.body;
+
+    
 
     const tableDb = "usuarios";
 
@@ -15,11 +22,25 @@ export const consultarUsuariosFormulario = async (req, res) => {
         let query = `
             SELECT 
                 usuarios.id,
-                usuarios.nombre, 
+                usuarios.nombre,
                 usuarios.apellido,
-                perfiles.nombre AS perfil
+                usuarios.usuario,
+                usuarios.email,
+                usuarios.telefono,
+                sucursales.nombre AS sucursal,
+                departamentos.nombre AS departamento,
+                perfiles.nombre AS perfil,
+                usuarios.estado,
+                usuarios.sesion,
+                usuarios.fecha_registro AS fechaRegistro,
+                usuarios.fecha_actualizacion AS fechaActualizacion
             FROM ${tableDb}
-            INNER JOIN perfiles ON usuarios.fk_perfil_id = perfiles.id
+            INNER JOIN 
+                sucursales ON usuarios.fk_sucursal_id = sucursales.id
+            INNER JOIN
+                departamentos ON usuarios.fk_departamento_id = departamentos.id
+            INNER JOIN 
+                perfiles ON usuarios.fk_perfil_id = perfiles.id
             WHERE usuarios.estado = 1
         `;
         const queryParams = [];
@@ -27,6 +48,18 @@ export const consultarUsuariosFormulario = async (req, res) => {
         if (nombre) {
             query += ` AND (usuarios.nombre LIKE ? OR usuarios.apellido LIKE ?)`;
             queryParams.push(`%${nombre}%`, `%${nombre}%`);
+        }
+        if (fkSucursalId) {
+            query += ` AND sucursales.id = ?`;
+            queryParams.push(fkSucursalId);
+        }
+        if (fkDepartamentoId) {
+            query += ` AND departamentos.id = ?`;
+            queryParams.push(fkDepartamentoId);
+        }
+        if (fkPerfilId) {
+            query += ` AND perfiles.id = ?`;
+            queryParams.push(fkPerfilId);
         }
 
         query += ` ORDER BY usuarios.nombre ASC LIMIT 20`;
@@ -39,8 +72,9 @@ export const consultarUsuariosFormulario = async (req, res) => {
             dataRes = result.map((usuario) => {
                 return {
                     id: usuario.id,
-                    nombre: usuario.nombre,
-                    apellido: usuario.apellido,
+                    nombre: `${usuario.nombre} ${usuario.apellido}`,
+                    sucursal: usuario.sucursal,
+                    departamento: usuario.departamento,
                     perfil: usuario.perfil,
                 };
             });

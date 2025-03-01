@@ -2,7 +2,12 @@ import { pool } from "../../../db.js";
 import * as methods from "../../../utils/methods.js";
 
 export const editarSucursal = async (req, res) => {
-    let { id, nombre, descripcion, estado } = req.body;
+    let { 
+        id, 
+        nombre, 
+        descripcion, 
+        estado 
+    } = req.body;
 
     const tableDb = "sucursales";
 
@@ -13,7 +18,7 @@ export const editarSucursal = async (req, res) => {
 
     try {
         // ------------------------------------------------------- [VALIDAR CONTENIDO]
-        methods.validarRequeridoEdicion(nombre, "nombre", "Name is required.");
+        methods.validarRequeridoEdicion(nombre, "El nombre es requerido", "Name is required.");
         // // ------------------------------------------------------- [LIMPIAR CONTENIDO]
         nombre = methods.limpiarEspacios(nombre);
         descripcion = methods.limpiarEspacios(descripcion);
