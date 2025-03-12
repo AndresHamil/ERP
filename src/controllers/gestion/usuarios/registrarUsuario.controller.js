@@ -21,7 +21,6 @@ export const registrarUsuario = async (req, res) => {
         methods.validarRequerido(fkSucursalId, "La sucursal es requerida", "fkSucursalId is required.");
         methods.validarRequerido(fkDepartamentoId, "El departamento es requerido", "fkDepartamentoId is required.");
         methods.validarRequerido(fkPerfilId, "El perfil es requerido", "fkPerfilId is required.");
-        // -------------------------------------------------------
         methods.validarFormatoEmail(email);
         methods.validarFormatoTelefono(telefono);
         // ------------------------------------------------------- [LIMPIAR CONTENIDO]
@@ -105,6 +104,7 @@ export const registrarUsuario = async (req, res) => {
 
     } catch (error) {
         successRes = false;
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
 
         if (error.customMessage) {
@@ -128,9 +128,7 @@ export const registrarUsuario = async (req, res) => {
             }  else {
                 messageRes = "Error al registrar el usuario.";
             }        
-        } else {
-            messageRes = "Error al registrar el usuario.";
-        }
+        } 
     }
 
     res.json({

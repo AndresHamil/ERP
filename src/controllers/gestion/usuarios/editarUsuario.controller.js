@@ -9,8 +9,8 @@ export const editarUsuario = async (req, res) => {
         nombre, 
         apellido,
         usuario, 
-        telefono,
         email,
+        telefono,
         password, 
         fkSucursalId,
         fkDepartamentoId,
@@ -38,8 +38,8 @@ export const editarUsuario = async (req, res) => {
         methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
         methods.validarTipoDato(apellido, "El apellido no tiene el formato adecuado", "apellido", "string");
         methods.validarTipoDato(usuario, "El usuario no tiene el formato adecuado", "usuario", "string");
-        methods.validarTipoDato(telefono, "El telefono no tiene el formato adecuado", "telefono", "string");
         methods.validarTipoDato(email, "El email no tiene el formato adecuado", "email", "string");
+        methods.validarTipoDato(telefono, "El telefono no tiene el formato adecuado", "telefono", "string");
         methods.validarTipoDato(password, "El password no tiene el formato adecuado", "password", "string");
         methods.validarTipoDato(fkSucursalId, "El fkSucursalId no tiene el formato adecuado", "fkSucursalId", "int");
         methods.validarTipoDato(fkDepartamentoId, "El fkDepartamentoId no tiene el formato adecuado", "fkDepartamentoId", "int");
@@ -110,6 +110,7 @@ export const editarUsuario = async (req, res) => {
         }
     } catch (error) {
         successRes = false
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
 
         if (error.customMessage) {
@@ -133,9 +134,7 @@ export const editarUsuario = async (req, res) => {
             }  else {
                 messageRes = "Error al registrar el usuario.";
             }        
-        } else {
-            messageRes = "Error al registrar el usuario.";
-        }
+        } 
     }
 
     res.json({

@@ -1,14 +1,13 @@
 import { pool } from "../../../db.js";
+import * as methods from "../../../utils/methods.js";
 
 export const consultarUsuariosFormulario = async (req, res) => {
-    const { 
-        nombre,
-        fkSucursalId,
-        fkDepartamentoId,
-        fkPerfilId
+    let { 
+        nombre, 
+        fkSucursalId, 
+        fkDepartamentoId, 
+        fkPerfilId, 
     } = req.body;
-
-    
 
     const tableDb = "usuarios";
 
@@ -18,7 +17,14 @@ export const consultarUsuariosFormulario = async (req, res) => {
         dataRes = null;
 
     try {
-        // Construir la consulta con la condición de estado
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
+        methods.validarTipoDato(fkSucursalId, "El fkSucursalId no tiene el formato adecuado", "fkSucursalId", "int");
+        methods.validarTipoDato(fkDepartamentoId, "El fkDepartamentoId no tiene el formato adecuado", "fkDepartamentoId", "int");
+        methods.validarTipoDato(fkPerfilId, "El fkPerfilId no tiene el formato adecuado", "fkPerfilId", "int");
+        // ------------------------------------------------------- [LIMPIAR CONTENIDO]
+        nombre = methods.limpiarEspacios(nombre);
+
         let query = `
             SELECT 
                 usuarios.id,
@@ -41,27 +47,30 @@ export const consultarUsuariosFormulario = async (req, res) => {
                 departamentos ON usuarios.fk_departamento_id = departamentos.id
             INNER JOIN 
                 perfiles ON usuarios.fk_perfil_id = perfiles.id
-            WHERE usuarios.estado = 1
         `;
+
         const queryParams = [];
+        const conditions = [];
+
 
         if (nombre) {
-            query += ` AND (usuarios.nombre LIKE ? OR usuarios.apellido LIKE ?)`;
+            conditions.push(`(usuarios.nombre LIKE ? OR usuarios.apellido LIKE ?)`);
             queryParams.push(`%${nombre}%`, `%${nombre}%`);
         }
         if (fkSucursalId) {
-            query += ` AND sucursales.id = ?`;
+            conditions.push(`sucursales.id = ?`);
             queryParams.push(fkSucursalId);
         }
         if (fkDepartamentoId) {
-            query += ` AND departamentos.id = ?`;
+            conditions.push(`departamentos.id = ?`);
             queryParams.push(fkDepartamentoId);
         }
         if (fkPerfilId) {
-            query += ` AND perfiles.id = ?`;
+            conditions.push(`perfiles.id = ?`);
             queryParams.push(fkPerfilId);
         }
-
+        conditions.push(`usuarios.estado = 1`);
+        query += ` WHERE ` + conditions.join(" AND ");
         query += ` ORDER BY usuarios.nombre ASC LIMIT 20`;
 
         const [result] = await pool.query(query, queryParams);
@@ -69,27 +78,30 @@ export const consultarUsuariosFormulario = async (req, res) => {
         if (result.length === 0) {
             messageRes = "No se encontraron registros";
         } else {
-            dataRes = result.map((usuario) => {
-                return {
-                    id: usuario.id,
-                    nombre: `${usuario.nombre} ${usuario.apellido}`,
-                    sucursal: usuario.sucursal,
-                    departamento: usuario.departamento,
-                    perfil: usuario.perfil,
-                };
-            });
+            dataRes = result.map((usuario) => ({
+                id: usuario.id,
+                nombre: `${usuario.nombre} ${usuario.apellido}`,
+                sucursal: usuario.sucursal,
+                departamento: usuario.departamento,
+                perfil: usuario.perfil,
+
+            }));
         }
+        
     } catch (error) {
-        successRes = false;
-        messageRes = "Error en el servidor";
+        successRes = false
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
+
+        if (error.customMessage) {
+            messageRes = error.customMessage;       
+        } 
     }
 
-    const response = {
+    res.json({
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-    };
-    res.json(response);
+    });
 };

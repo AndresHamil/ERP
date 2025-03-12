@@ -1,17 +1,9 @@
 import { pool } from "../../../db.js";
+import * as methods from "../../../utils/methods.js";
 
 export const eliminarUsuario = async (req, res) => {
     const { id } = req.body;
     const tableDb = "usuarios";
-
-    if (!id) {
-        return res.status(400).json({
-            success: false,
-            message: "El ID es obligatorio.",
-            error: null,
-            data: null,
-        });
-    }
 
     let successRes = true,
         messageRes = "El usuario se eliminó correctamente.",
@@ -19,6 +11,12 @@ export const eliminarUsuario = async (req, res) => {
         dataRes = null;
 
     try {
+
+        // ------------------------------------------------------- [VALIDAR CONTENIDO]
+        methods.validarRequerido(id, "El id es requerido", "id");
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
+
         const [result] = await pool.query(
             `DELETE FROM ${tableDb} WHERE id = ?`,
             [id]
@@ -31,12 +29,14 @@ export const eliminarUsuario = async (req, res) => {
         }
     } catch (error) {
         successRes = false;
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
 
-        if (error.code === "ER_ROW_IS_REFERENCED_2") {
+        if (error.customMessage) {
+            messageRes = error.customMessage; 
+        }
+        else if (error.code === "ER_ROW_IS_REFERENCED_2") {
             messageRes ="No se puede eliminar este usuario porque tiene registros dependientes.";
-        } else {
-            messageRes = "Error interno en el servidor.";
         }
     }
 

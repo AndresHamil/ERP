@@ -2,7 +2,7 @@ import { pool } from "../../../db.js";
 import * as methods from "../../../utils/methods.js";
 
 export const consultarUsuariosFiltros = async (req, res) => {
-    const { 
+    let { 
         id, 
         nombre, 
         apellido, 
@@ -26,9 +26,39 @@ export const consultarUsuariosFiltros = async (req, res) => {
     let successRes = true,
         messageRes = "Consulta exitosa",
         errorRes = null,
-        dataRes = null;
+        dataRes = null,
+        totalCountRes = 0,
+        resultConutRes = 0
 
     try {
+
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
+        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
+        methods.validarTipoDato(apellido, "El apellido no tiene el formato adecuado", "apellido", "string");
+        methods.validarTipoDato(usuario, "El usuario no tiene el formato adecuado", "usuario", "string");
+        methods.validarTipoDato(email, "El email no tiene el formato adecuado", "email", "string");
+        methods.validarTipoDato(telefono, "El telefono no tiene el formato adecuado", "telefono", "string");
+        methods.validarTipoDato(sucursal, "La sucursal no tiene el formato adecuado", "sucursal", "string");
+        methods.validarTipoDato(fkSucursalId, "El fkSucursalId no tiene el formato adecuado", "fkSucursalId", "int");
+        methods.validarTipoDato(departamento, "El departamento no tiene el formato adecuado", "departamento", "string");
+        methods.validarTipoDato(fkDepartamentoId, "El fkDepartamentoId no tiene el formato adecuado", "fkDepartamentoId", "int");
+        methods.validarTipoDato(perfil, "El perfil no tiene el formato adecuado", "perfil", "string");
+        methods.validarTipoDato(fkPerfilId, "El fkPerfilId no tiene el formato adecuado", "fkPerfilId", "int");
+        methods.validarTipoDato(fechaRegistro, "La fechaRegistro no tiene el formato adecuado", "fechaRegistro", "string");
+        methods.validarTipoDato(fechaActualizacion, "La fechaActualizacion no tiene el formato adecuado", "fechaActualizacion", "string");
+        methods.validarTipoDato(estado, "El estado no tiene el formato adecuado", "estado", "bool");
+        methods.validarTipoDato(sesion, "El sesion no tiene el formato adecuado", "sesion", "bool");
+        // ------------------------------------------------------- [LIMPIAR CONTENIDO]
+        nombre = methods.limpiarEspacios(nombre);
+        apellido = methods.limpiarEspacios(apellido);
+        usuario = methods.limpiarEspacios(usuario);
+        email = methods.limpiarEspacios(email);
+        telefono = methods.limpiarEspacios(telefono);
+        sucursal = methods.limpiarEspacios(sucursal);
+        departamento = methods.limpiarEspacios(departamento);
+        perfil = methods.limpiarEspacios(perfil);
+        
         let query = `
             SELECT 
                 usuarios.id,
@@ -93,7 +123,7 @@ export const consultarUsuariosFiltros = async (req, res) => {
             queryParams.push(`%${departamento}%`);
         }
         if (fkDepartamentoId) {
-            conditions.push(`depatamento.id = ?`);
+            conditions.push(`departamentos.id = ?`);
             queryParams.push(fkDepartamentoId);
         }
         if (perfil) {
@@ -120,7 +150,6 @@ export const consultarUsuariosFiltros = async (req, res) => {
             conditions.push(`usuarios.estado = ?`);
             queryParams.push(estado);
         }
-
         if (conditions.length > 0) {
             query += ` WHERE ` + conditions.join(" AND ");
         }
@@ -147,12 +176,23 @@ export const consultarUsuariosFiltros = async (req, res) => {
                 estado: usuario.estado === 1,
                 sesion: usuario.sesion === 1
             }));
+
+            resultConutRes = dataRes.length;
+            
         }
+
+        const [[{ totalCount: count }]] = await pool.query(`SELECT COUNT(*) AS totalCount FROM ${tableDb};`);
+        
+        totalCountRes = count;
         
     } catch (error) {
         successRes = false;
-        messageRes = "Error en el servidor";
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
+
+        if (error.customMessage) {
+            messageRes = error.customMessage;       
+        } 
     }
 
     res.json({
@@ -160,5 +200,7 @@ export const consultarUsuariosFiltros = async (req, res) => {
         message: messageRes,
         error: errorRes,
         data: dataRes,
+        totalCount: totalCountRes,
+        resultConut: resultConutRes
     });
 };

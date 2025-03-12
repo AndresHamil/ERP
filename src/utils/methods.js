@@ -1,52 +1,10 @@
 import { pool } from "../db.js";
 import bcrypt from "bcrypt";
 
-export const generarHash = (password) => {
-    if (!password) {
-        return; 
-    }
-    const saltRounds = 10;
-    return bcrypt.hash(password, saltRounds);
-}
-export const compararHash = (password, hash) => {
-    return bcrypt.compare(password, hash);
-}
-export const generarUsuario = (nombre, apellido) => {
-    const nombreLimpio = nombre.replace(/\s+/g, "").toLowerCase();
-    const apellidoLimpio = apellido.replace(/\s+/g, "").toLowerCase();
-
-    const fecha = new Date();
-    const fechaFormato = `${fecha.getMonth() + 1}${fecha.getDate()}${fecha.getFullYear() % 100}${fecha.getHours()}${fecha.getMinutes()}${fecha.getSeconds()}`;
-
-    return `${nombreLimpio}${apellidoLimpio}${fechaFormato}`;
-};
-export const limpiarEspacios = (string) => {
-    return string ? string.trim() : null;
-};
+// ------------------------------------------------------- [VALIDAR CONTENIDO]
 export const validarRequerido = (campo, mensaje, valor) => {
     if (!campo) {
         const error = new Error((`${valor} is required.`));
-        error.customMessage = mensaje;
-        throw error;
-    }
-};
-export const validarTipoDato = (campo, mensaje, valor, tipo) => {
-    const tiposValidos = {
-        string: (valor) => valor === null || typeof valor === "string",
-        int: (valor) => valor === null || Number.isInteger(valor),
-        float: (valor) => valor === null || (typeof valor === "number" && !Number.isInteger(valor)),
-        object: (valor) => valor === null || (typeof valor === "object" && !Array.isArray(valor)),
-        array: (valor) => valor === null || Array.isArray(valor),
-        bool: (valor) => valor === null || typeof valor === "boolean"
-    };
-
-    if (!tiposValidos[tipo]) {
-        throw new Error(`Invalid type "${valor}". Allowed types: ${Object.keys(tiposValidos).join(", ")}`);
-    }
-
-    if (!tiposValidos[tipo](campo)) {
-        
-        const error = new Error((`The ${valor} does not have the correct format.`));
         error.customMessage = mensaje;
         throw error;
     }
@@ -58,6 +16,7 @@ export const validarRequeridoEdicion = (campo, mensaje, errorMsg) => {
         throw error;
     }
 };
+// ------------------------------------------------------- [VALIDAR FORMATO CONTENIDO]
 export const validarFormatoEmail = (email) => {
     const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -80,6 +39,33 @@ export const validarFormatoTelefono = (telefono) => {
         throw error;
     }
 };
+// ------------------------------------------------------- [VALIDAR TIPO DATO]
+export const validarTipoDato = (campo, mensaje, valor, tipo) => {
+    const tiposValidos = {
+        string: (valor) => valor === null || typeof valor === "string",
+        int: (valor) => valor === null || Number.isInteger(valor),
+        float: (valor) => valor === null || (typeof valor === "number" && !Number.isInteger(valor)),
+        object: (valor) => valor === null || (typeof valor === "object" && !Array.isArray(valor)),
+        array: (valor) => valor === null || Array.isArray(valor),
+        bool: (valor) => valor === null || typeof valor === "boolean"
+    };
+
+    if (!tiposValidos[tipo]) {
+        throw new Error(`Invalid type "${valor}". Allowed types: ${Object.keys(tiposValidos).join(", ")}`);
+    }
+
+    if (!tiposValidos[tipo](campo)) {
+        
+        const error = new Error((`The ${valor} does not have the correct format.`));
+        error.customMessage = mensaje;
+        throw error;
+    }
+};
+// ------------------------------------------------------- [LIMPIAR CONTENIDO]
+export const limpiarEspacios = (string) => {
+    return string ? string.trim() : null;
+};
+// ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
 export const capitalizarString = (string) => {
     if (!string) {
         return; 
@@ -87,6 +73,7 @@ export const capitalizarString = (string) => {
 
     return string.split(" ") .map((palabra) => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase()).join(" ");
 };
+// ------------------------------------------------------- [FORMATEAR CONTENIDO]
 export const formatearFecha = (fecha) => {
     // Verificamos si la fecha es válida
     if (!fecha) {
@@ -114,6 +101,28 @@ export const formatearFecha = (fecha) => {
     // Formateamos la fecha
     return `${año}/${mes}/${dia} ${horas}:${minutos} ${ampm}`;
 };
+// ------------------------------------------------------- [HASH PASSWORD]
+export const generarHash = (password) => {
+    if (!password) {
+        return; 
+    }
+    const saltRounds = 10;
+    return bcrypt.hash(password, saltRounds);
+}
+export const compararHash = (password, hash) => {
+    return bcrypt.compare(password, hash);
+}
+// ------------------------------------------------------- [GENERAR USUARIO]
+export const generarUsuario = (nombre, apellido) => {
+    const nombreLimpio = nombre.replace(/\s+/g, "").toLowerCase();
+    const apellidoLimpio = apellido.replace(/\s+/g, "").toLowerCase();
+
+    const fecha = new Date();
+    const fechaFormato = `${fecha.getMonth() + 1}${fecha.getDate()}${fecha.getFullYear() % 100}${fecha.getHours()}${fecha.getMinutes()}${fecha.getSeconds()}`;
+
+    return `${nombreLimpio}${apellidoLimpio}${fechaFormato}`;
+};
+
 
 
 
