@@ -111,11 +111,11 @@ export const editarUsuario = async (req, res) => {
                     ELSE ? 
                 END,
                 estado = CASE 
-                    WHEN ? IS NULL THEN ? 
+                    WHEN ? IS NULL THEN estado 
                     ELSE ? 
                 END,
                 sesion = CASE 
-                    WHEN ? IS NULL THEN ? 
+                    WHEN ? IS NULL THEN sesion 
                     ELSE ? 
                 END
             WHERE id = ?
@@ -130,8 +130,8 @@ export const editarUsuario = async (req, res) => {
             fkSucursalId, fkSucursalId, fkSucursalId,
             fkDepartamentoId, fkDepartamentoId, fkDepartamentoId,
             fkPerfilId, fkPerfilId, fkPerfilId,
-            estado, estado, estado, 
-            sesion, sesion, sesion,
+            estado, estado, 
+            sesion, sesion,
             id
         ];
         const [result] = await pool.query(queryActualizacion, queryParamsActualizacion);

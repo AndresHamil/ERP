@@ -161,6 +161,7 @@ export const consultarUsuariosFiltros = async (req, res) => {
             messageRes = "No se encontraron registros";
             resultConutRes = 0;
         } else {
+
             dataRes = result.map((usuario) => ({
                 id: usuario.id,
                 nombre: usuario.nombre,
@@ -173,8 +174,8 @@ export const consultarUsuariosFiltros = async (req, res) => {
                 perfil: usuario.perfil,
                 fechaRegistro: methods.formatearFecha(usuario.fechaRegistro),
                 fechaActualizacion: methods.formatearFecha(usuario.fechaActualizacion),
-                estado: usuario.estado === 1,
-                sesion: usuario.sesion === 1
+                estado: usuario.estado === 1 ? true : false,
+                sesion: usuario.sesion === 1 ? true : false
             }));
 
             resultConutRes = dataRes.length; 
