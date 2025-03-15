@@ -120,5 +120,4 @@ export const consultarSucursalesFiltros = async (req, res) => {
     };
     
     res.json(response);
-    
 };

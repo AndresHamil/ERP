@@ -93,5 +93,4 @@ export const registrarSucursal = async (req, res) => {
     };
     
     res.json(response);
-    
 };
