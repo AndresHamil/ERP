@@ -1,7 +1,10 @@
 import { pool } from "../../../db.js";
+import * as methods from "../../../utils/methods.js";
 
 export const consultarSucursalesFormulario = async (req, res) => {
-    const { nombre } = req.body;
+    let { 
+        nombre = null 
+    } = req.body ?? {};
 
     const tableDb = "sucursales";
 
@@ -11,21 +14,28 @@ export const consultarSucursalesFormulario = async (req, res) => {
         dataRes = null;
 
     try {
-        // Construir la consulta con la condición de estado
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
+        // ------------------------------------------------------- [LIMPIAR CONTENIDO]
+        nombre = methods.limpiarEspacios(nombre);
+
         let query = `
             SELECT 
                 sucursales.id,
                 sucursales.nombre
             FROM ${tableDb}
-            WHERE sucursales.estado = 1
         `;
+
         const queryParams = [];
+        const conditions = [];
 
         if (nombre) {
-            query += ` AND sucursales.nombre LIKE ?`;
-            queryParams.push(`%${nombre}%`);
+            conditions.push(`(sucursales.nombre LIKE ?)`);
+            queryParams.push(`%${nombre}%`, `%${nombre}%`);
         }
 
+        conditions.push(`sucursales.estado = 1`);
+        query += ` WHERE ` + conditions.join(" AND ");
         query += ` ORDER BY sucursales.nombre ASC LIMIT 20`;
 
         const [result] = await pool.query(query, queryParams);
@@ -41,9 +51,13 @@ export const consultarSucursalesFormulario = async (req, res) => {
             });
         }
     } catch (error) {
-        successRes = false;
-        messageRes = "Error en el servidor";
+        successRes = false
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
+
+        if (error.customMessage) {
+            messageRes = error.customMessage;       
+        } 
     }
 
     const response = {
@@ -52,5 +66,6 @@ export const consultarSucursalesFormulario = async (req, res) => {
         error: errorRes,
         data: dataRes,
     };
+
     res.json(response);
 };

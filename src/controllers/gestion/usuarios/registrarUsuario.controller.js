@@ -1,9 +1,17 @@
 import { pool } from "../../../db.js";
-
 import * as methods from "../../../utils/methods.js";
 
 export const registrarUsuario = async (req, res) => {
-    let { nombre, apellido, telefono, email, password, fkSucursalId, fkDepartamentoId,  fkPerfilId } = req.body;
+    let { 
+        nombre = null, 
+        apellido = null, 
+        telefono = null, 
+        email = null, 
+        password = null, 
+        fkSucursalId = null, 
+        fkDepartamentoId = null,  
+        fkPerfilId = null 
+    } = req.body ?? {};
 
     const tableDb = "usuarios";
 
@@ -13,22 +21,41 @@ export const registrarUsuario = async (req, res) => {
         dataRes = null;
 
     try {
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        methods.validarTipoDato(apellido, "El", "apellido", "string");
+        methods.validarTipoDato(email, "El", "email", "string");
+        methods.validarTipoDato(password, "La", "contraseña", "string");
+        methods.validarTipoDato(telefono, "El", "telefono", "string");
+        methods.validarTipoDato(fkSucursalId, "El", "fkSucursalId", "int");
+        methods.validarTipoDato(fkDepartamentoId, "El", "fkDepartamentoId", "int");
+        methods.validarTipoDato(fkPerfilId, "El", "fkPerfilId", "int");
         // ------------------------------------------------------- [VALIDAR CONTENIDO]
-        methods.validarRequerido(nombre, "El nombre es requerido", "Name is required.");
-        methods.validarRequerido(apellido, "El apellido es requerido", "Last name is required.");
-        methods.validarRequerido(email, "El correo electronico es requerido", "Email is required.");
-        methods.validarRequerido(password, "La constraseña es requerida", "Password is required.");
-        methods.validarRequerido(fkSucursalId, "La sucursal es requerida", "fkSucursalId is required.");
-        methods.validarRequerido(fkDepartamentoId, "El departamento es requerido", "fkDepartamentoId is required.");
-        methods.validarRequerido(fkPerfilId, "El perfil es requerido", "fkPerfilId is required.");
-        methods.validarFormatoEmail(email);
-        methods.validarFormatoTelefono(telefono);
+        methods.validarRequerido(nombre, "El", "nombre");
+        methods.validarRequerido(apellido, "El", "apellido");
+        methods.validarRequerido(email, "El", "email");
+        methods.validarRequerido(password, "La", "contraseña");
+        methods.validarRequerido(fkSucursalId, "El", "fkSucursalId");
+        methods.validarRequerido(fkDepartamentoId, "El", "fkDepartamentoId");
+        methods.validarRequerido(fkPerfilId, "El", "fkPerfilId");
+        // ------------------------------------------------------- [VALIDAR TIPO CONTENIDO]
+        methods.validarContenidoString(nombre, "El", "nombre");
+        methods.validarContenidoString(apellido, "El", "apellido");
         // ------------------------------------------------------- [LIMPIAR CONTENIDO]
         nombre = methods.limpiarEspacios(nombre);
         apellido = methods.limpiarEspacios(apellido);
         telefono = methods.limpiarEspacios(telefono);
         email = methods.limpiarEspacios(email);
         password = methods.limpiarEspacios(password);
+        // ------------------------------------------------------- [VALIDAR LONGITUD CONTENIDO]
+        methods.validarLongitudString(nombre, "El", "nombre", 50);
+        methods.validarLongitudString(apellido, "El", "apellido", 50);
+        methods.validarLongitudString(email, "El", "email", 100);
+        methods.validarLongitudString(password, "La", "contraseña", 30);
+        methods.validarLongitudString(telefono, "El", "telefono", 10);
+        // ------------------------------------------------------- [VALIDAR FORMATO CONTENIDO]
+        methods.validarFormatoEmail(email);
+        methods.validarFormatoTelefono(telefono);
         // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
         nombre = methods.capitalizarString(nombre);
         apellido = methods.capitalizarString(apellido);
@@ -131,10 +158,12 @@ export const registrarUsuario = async (req, res) => {
         } 
     }
 
-    res.json({
+    const response = {
         success: successRes,
         message: messageRes, 
         error: errorRes, 
         data: dataRes,
-    });
+    };
+    
+    res.json(response);
 };

@@ -10,10 +10,7 @@ export const consultarUsuario = async (req, res) => {
         errorRes = null,
         dataRes = null;
 
-    
-
     try {
-
         // ------------------------------------------------------- [VALIDAR CONTENIDO]
         methods.validarRequerido(id, "El id es requerido", "id");
         // ------------------------------------------------------- [VALIDAR TIPO DATO]

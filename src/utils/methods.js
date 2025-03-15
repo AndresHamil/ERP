@@ -2,17 +2,35 @@ import { pool } from "../db.js";
 import bcrypt from "bcrypt";
 
 // ------------------------------------------------------- [VALIDAR CONTENIDO]
-export const validarRequerido = (campo, mensaje, valor) => {
+export const validarRequerido = (campo, prefijo, valor) => {
     if (!campo) {
-        const error = new Error((`${valor} is required.`));
-        error.customMessage = mensaje;
+        const error = new Error(`The ${valor} is required.`);
+        error.customMessage = `${prefijo} ${valor} es requerido.`;
         throw error;
     }
 };
-export const validarRequeridoEdicion = (campo, mensaje, errorMsg) => {
+export const validarContenidoString = (campo, prefijo, valor) => {
+    if (typeof campo === "string") {
+        const contieneNumeros = /\d/.test(campo);
+
+        if (contieneNumeros) {
+            const error = new Error(`The ${valor} must not contain numeric characters.`);
+            error.customMessage = `${prefijo} ${valor} no debe tener caracteres numéricos.`;
+            throw error;
+        }
+    }
+};
+export const validarRequeridoEdicion = (campo, prefijo, valor) => {
     if (campo === "") {
-        const error = new Error(errorMsg);
-        error.customMessage = mensaje;
+        const error = new Error(`The ${valor} is required.`);
+        error.customMessage = `${prefijo} ${valor} es requerido.`;
+        throw error;
+    }
+};
+export const validarLongitudString = (campo, tipo, valor, len) => {
+    if (campo && campo.length > len) {
+        const error = new Error(`The ${valor} must have a maximum of ${len} characters.`);
+        error.customMessage = `${tipo} ${valor} solo puede tener un maximo de ${len} caracteres.`;
         throw error;
     }
 };
@@ -40,7 +58,7 @@ export const validarFormatoTelefono = (telefono) => {
     }
 };
 // ------------------------------------------------------- [VALIDAR TIPO DATO]
-export const validarTipoDato = (campo, mensaje, valor, tipo) => {
+export const validarTipoDato = (campo, prefijo, valor, tipo) => {
     const tiposValidos = {
         string: (valor) => valor === null || typeof valor === "string",
         int: (valor) => valor === null || Number.isInteger(valor),
@@ -57,7 +75,7 @@ export const validarTipoDato = (campo, mensaje, valor, tipo) => {
     if (!tiposValidos[tipo](campo)) {
         
         const error = new Error((`The ${valor} does not have the correct format.`));
-        error.customMessage = mensaje;
+        error.customMessage = `${prefijo} ${valor} no tiene el formato adecuado.`;
         throw error;
     }
 };
@@ -75,30 +93,24 @@ export const capitalizarString = (string) => {
 };
 // ------------------------------------------------------- [FORMATEAR CONTENIDO]
 export const formatearFecha = (fecha) => {
-    // Verificamos si la fecha es válida
     if (!fecha) {
-        return null; // o un valor predeterminado si la fecha no está definida
+        return null;
     }
 
     const date = new Date(fecha);
 
-    // Obtenemos el día, mes y año
     const dia = String(date.getDate()).padStart(2, "0");
     const mes = String(date.getMonth() + 1).padStart(2, "0");
     const año = String(date.getFullYear()).slice(-4); // Tomamos solo los últimos dos dígitos del año
 
-    // Obtenemos la hora y los minutos
     let horas = date.getHours();
     const minutos = String(date.getMinutes()).padStart(2, "0");
 
-    // Definimos si es AM o PM
     const ampm = horas >= 12 ? "pm" : "am";
 
-    // Convertimos el formato de 24 horas a 12 horas
     horas = horas % 12;
     horas = horas ? String(horas).padStart(2, "0") : "12"; // El 0 se convierte en 12
 
-    // Formateamos la fecha
     return `${año}/${mes}/${dia} ${horas}:${minutos} ${ampm}`;
 };
 // ------------------------------------------------------- [HASH PASSWORD]
@@ -114,13 +126,45 @@ export const compararHash = (password, hash) => {
 }
 // ------------------------------------------------------- [GENERAR USUARIO]
 export const generarUsuario = (nombre, apellido) => {
-    const nombreLimpio = nombre.replace(/\s+/g, "").toLowerCase();
-    const apellidoLimpio = apellido.replace(/\s+/g, "").toLowerCase();
+    const primerNombre = nombre.split(" ")[0] ?? "";
+    const primerApellido = apellido.split(" ")[0] ?? "";
+
+    const nombreLimpio = primerNombre.replace(/\s+/g, "").toLowerCase();
+    const apellidoLimpio = primerApellido.replace(/\s+/g, "").toLowerCase();
 
     const fecha = new Date();
     const fechaFormato = `${fecha.getMonth() + 1}${fecha.getDate()}${fecha.getFullYear() % 100}${fecha.getHours()}${fecha.getMinutes()}${fecha.getSeconds()}`;
 
-    return `${nombreLimpio}${apellidoLimpio}${fechaFormato}`;
+    return `${nombreLimpio}.${apellidoLimpio}.${fechaFormato}`;
+};
+// ------------------------------------------------------- [GENERAR USUARIO EDICION]
+export const generarUsuarioEdicion = async (id, nombre, apellido) => {
+    if ((nombre !== null && nombre !== "") || (apellido !== null && apellido !== "")) {
+        const queryConsulta = `
+            SELECT 
+                usuarios.id,
+                usuarios.nombre,
+                usuarios.apellido
+            FROM 
+                usuarios
+            WHERE usuarios.id = ?
+        `;
+        const queryParamsConsulta = [id];
+
+        const [resutl] = await pool.query(queryConsulta, queryParamsConsulta);
+            
+        if (resutl.length === 0) {
+            const error = new Error(`No record found for id '${id}' in table 'usuarios'.`);
+            error.customMessage = `El registro con id '${id}' no existe en la tabla 'usuarios'.`;
+            throw error;
+        }else{
+            const usuario = resutl[0];
+            const nombreUsuario = nombre ? nombre : usuario.nombre;
+            const apellidoUsuario = apellido ? apellido : usuario.apellido;
+
+            return generarUsuario(nombreUsuario, apellidoUsuario);
+        }
+    }
 };
 
 

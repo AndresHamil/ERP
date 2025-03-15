@@ -2,16 +2,36 @@ import { pool } from "../../../db.js";
 import * as methods from "../../../utils/methods.js";
 
 export const consultarSucursalesFiltros = async (req, res) => {
-    const { id, nombre, descripcion, estado } = req.body;
+    let { 
+        id = null, 
+        nombre = null, 
+        descripcion = null, 
+        fechaRegistro = null, 
+        fechaActualizacion = null, 
+        estado = null 
+    } = req.body ?? {};
 
     const tableDb = "sucursales";
 
     let successRes = true,
         messageRes = "Consulta exitosa",
         errorRes = null,
-        dataRes = null;
+        dataRes = null,
+        totalCountRes = null,
+        resultConutRes = null
 
     try {
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
+        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
+        methods.validarTipoDato(descripcion, "La descripcion no tiene el formato adecuado", "descripcion", "string");
+        methods.validarTipoDato(fechaRegistro, "La fechaRegistro no tiene el formato adecuado", "fechaRegistro", "string");
+        methods.validarTipoDato(fechaActualizacion, "La fechaActualizacion no tiene el formato adecuado", "fechaActualizacion", "string");
+        methods.validarTipoDato(estado, "El estado no tiene el formato adecuado", "estado", "bool");
+        // ------------------------------------------------------- [LIMPIAR CONTENIDO]
+        nombre = methods.limpiarEspacios(nombre);
+        descripcion = methods.limpiarEspacios(descripcion);
+
         let query = `
             SELECT 
                 sucursales.id,
@@ -39,11 +59,18 @@ export const consultarSucursalesFiltros = async (req, res) => {
             conditions.push(`sucursales.descripcion LIKE ?`);
             queryParams.push(`%${descripcion}%`);
         }
+        if (fechaRegistro) {
+            conditions.push(`DATE(sucursales.fecha_registro) = ?`);
+            queryParams.push(fechaRegistro);
+        }
+        if (fechaActualizacion) {
+            conditions.push(`DATE(sucursales.fecha_actualizacion) = ?`);
+            queryParams.push(fechaActualizacion);
+        }
         if (estado != null) {
             conditions.push(`sucursales.estado = ?`);
             queryParams.push(estado);
         }
-
         if (conditions.length > 0) {
             query += ` WHERE ` + conditions.join(" AND ");
         }
@@ -54,6 +81,7 @@ export const consultarSucursalesFiltros = async (req, res) => {
 
         if (result.length === 0) {
             messageRes = "No se encontraron registros";
+            resultConutRes = 0;
         } else {
             dataRes = result.map((sucursal) => ({
                 id: sucursal.id,
@@ -63,12 +91,22 @@ export const consultarSucursalesFiltros = async (req, res) => {
                 fechaActualizacion: methods.formatearFecha(sucursal.fechaActualizacion),
                 estado: sucursal.estado === 1 ? true : false      
             }));
+
+            resultConutRes = dataRes.length; 
         }
+
+        const [[{ totalCount: count }]] = await pool.query(`SELECT COUNT(*) AS totalCount FROM ${tableDb};`);
+        
+        totalCountRes = count;
         
     } catch (error) {
         successRes = false;
-        messageRes = "Error en el servidor";
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
+
+        if (error.customMessage) {
+            messageRes = error.customMessage;       
+        } 
     }
 
     const response = {
@@ -76,6 +114,8 @@ export const consultarSucursalesFiltros = async (req, res) => {
         message: messageRes,
         error: errorRes,
         data: dataRes,
+        totalCount: totalCountRes,
+        resultConut: resultConutRes
     };
     
     res.json(response);

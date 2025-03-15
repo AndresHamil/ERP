@@ -2,11 +2,12 @@ import { pool } from "../../../db.js";
 import * as methods from "../../../utils/methods.js";
 
 export const registrarSucursal = async (req, res) => {
-    let { nombre, descripcion } = req.body;
+    let { 
+        nombre = null, 
+        descripcion = null 
+    } = req.body ?? {};
 
     const tableDb = "sucursales";
-
-    
 
     let successRes = true,
         messageRes = "Registro exitoso",
@@ -14,17 +15,22 @@ export const registrarSucursal = async (req, res) => {
         dataRes = null;
 
     try {
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        methods.validarTipoDato(descripcion, "La", "descripcion", "string");
         // ------------------------------------------------------- [VALIDAR CONTENIDO]
-        methods.validarRequerido(nombre, "El nombre es requerido", "Name is required.");
-        // ------------------------------------------------------- [VALIDAR FORMATO]
+        methods.validarRequerido(nombre, "El", "nombre");
+        // ------------------------------------------------------- [VALIDAR TIPO CONTENIDO]
+        methods.validarContenidoString(nombre, "El", "nombre");
         // ------------------------------------------------------- [LIMPIAR CONTENIDO]
         nombre = methods.limpiarEspacios(nombre);
         descripcion = methods.limpiarEspacios(descripcion);
+        // ------------------------------------------------------- [VALIDAR LONGITUD CONTENIDO]
+        methods.validarLongitudString(nombre, "El", "nombre", 50);
+        methods.validarLongitudString(descripcion, "La", "descripcion", 200);
         // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
         nombre = methods.capitalizarString(nombre);
         descripcion = methods.capitalizarString(descripcion);
-
-        console.log(descripcion);
 
         const queryInsercion = `
             INSERT INTO ${tableDb} (nombre, descripcion) 
@@ -33,6 +39,7 @@ export const registrarSucursal = async (req, res) => {
         const paramsInsercion = [nombre, descripcion];
 
         let [result] = await pool.query(queryInsercion, paramsInsercion);
+
         const id = result.insertId;
 
         const querySeleccion = `
@@ -63,6 +70,7 @@ export const registrarSucursal = async (req, res) => {
 
     } catch (error) {
         successRes = false;
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
 
         if (error.customMessage) {
@@ -71,15 +79,15 @@ export const registrarSucursal = async (req, res) => {
             if (error.sqlMessage.includes("sucursales.nombre")) {
                 messageRes = "Ya existe unsa sucursal con el mismo nombre.";
             } 
-        }  else {
-            messageRes = "Error en el servidor.";
         }
     }
 
-    res.json({
+    const response = {
         success: successRes,
         message: messageRes, 
         error: errorRes, 
         data: dataRes,
-    });
+    };
+    
+    res.json(response);
 };

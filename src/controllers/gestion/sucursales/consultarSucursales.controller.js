@@ -48,12 +48,9 @@ export const consultarSucursales = async (req, res) => {
         totalCount = count;
 
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Ocurrió un error en el servidor",
-            error: error.message,
-            data: null,
-        });
+        successRes = false
+        messageRes = "Ocurrió un error en el servidor";
+        errorRes = error.message;
     }
 
     res.json({

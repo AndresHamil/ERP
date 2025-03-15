@@ -3,23 +3,23 @@ import * as methods from "../../../utils/methods.js";
 
 export const consultarUsuariosFiltros = async (req, res) => {
     let { 
-        id, 
-        nombre, 
-        apellido, 
-        usuario, 
-        email, 
-        telefono, 
-        sucursal, 
-        fkSucursalId, 
-        departamento, 
-        fkDepartamentoId, 
-        perfil, 
-        fkPerfilId, 
-        fechaRegistro,
-        fechaActualizacion,
-        estado, 
-        sesion 
-    } = req.body;
+        id = null, 
+        nombre = null, 
+        apellido = null, 
+        usuario = null, 
+        email = null, 
+        telefono = null, 
+        sucursal = null, 
+        fkSucursalId = null, 
+        departamento = null, 
+        fkDepartamentoId = null, 
+        perfil = null, 
+        fkPerfilId = null, 
+        fechaRegistro = null,
+        fechaActualizacion = null,
+        estado = null, 
+        sesion = null 
+    } = req.body ?? {};
 
     const tableDb = "usuarios";
 
@@ -27,11 +27,10 @@ export const consultarUsuariosFiltros = async (req, res) => {
         messageRes = "Consulta exitosa",
         errorRes = null,
         dataRes = null,
-        totalCountRes = 0,
-        resultConutRes = 0
+        totalCountRes = null,
+        resultConutRes = null
 
     try {
-
         // ------------------------------------------------------- [VALIDAR TIPO DATO]
         methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
         methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
@@ -160,6 +159,7 @@ export const consultarUsuariosFiltros = async (req, res) => {
 
         if (result.length === 0) {
             messageRes = "No se encontraron registros";
+            resultConutRes = 0;
         } else {
             dataRes = result.map((usuario) => ({
                 id: usuario.id,
@@ -177,8 +177,7 @@ export const consultarUsuariosFiltros = async (req, res) => {
                 sesion: usuario.sesion === 1
             }));
 
-            resultConutRes = dataRes.length;
-            
+            resultConutRes = dataRes.length; 
         }
 
         const [[{ totalCount: count }]] = await pool.query(`SELECT COUNT(*) AS totalCount FROM ${tableDb};`);
@@ -195,12 +194,14 @@ export const consultarUsuariosFiltros = async (req, res) => {
         } 
     }
 
-    res.json({
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
         totalCount: totalCountRes,
         resultConut: resultConutRes
-    });
+    };
+    
+    res.json(response);
 };

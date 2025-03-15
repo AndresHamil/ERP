@@ -10,16 +10,12 @@ export const consultarSucursal = async (req, res) => {
         errorRes = null,
         dataRes = null;
 
-    if (!id) {
-        return res.status(400).json({
-            success: false,
-            message: "Se requiere un ID.",
-            error: "ID field is missing in the request.",
-            data: null,
-        });
-    }
-
     try {
+        // ------------------------------------------------------- [VALIDAR CONTENIDO]
+        methods.validarRequerido(id, "El id es requerido", "id");
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
+
         const queryConsulta = `
             SELECT 
                 sucursales.id,
@@ -51,9 +47,11 @@ export const consultarSucursal = async (req, res) => {
         }
     } catch (error) {
         successRes = false;
-        errorRes = error.message;
         messageRes = "Ocurrió un error en el servidor";
-        console.error("Error al consultar sucursal:", error);
+        errorRes = error.message;
+        if (error.customMessage) {
+            messageRes = error.customMessage; 
+        }
     }
 
     res.json({

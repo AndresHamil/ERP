@@ -3,11 +3,11 @@ import * as methods from "../../../utils/methods.js";
 
 export const consultarUsuariosFormulario = async (req, res) => {
     let { 
-        nombre, 
-        fkSucursalId, 
-        fkDepartamentoId, 
-        fkPerfilId, 
-    } = req.body;
+        nombre = null, 
+        fkSucursalId = null, 
+        fkDepartamentoId = null, 
+        fkPerfilId = null, 
+    } = req.body ?? {};
 
     const tableDb = "usuarios";
 
@@ -98,10 +98,12 @@ export const consultarUsuariosFormulario = async (req, res) => {
         } 
     }
 
-    res.json({
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-    });
+    };
+    
+    res.json(response);
 };
