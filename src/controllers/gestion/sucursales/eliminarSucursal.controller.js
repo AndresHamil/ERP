@@ -46,4 +46,5 @@ export const eliminarSucursal = async (req, res) => {
     };
     
     res.json(response);
+    
 };
