@@ -142,8 +142,6 @@ export const registrarUsuario = async (req, res) => {
                 messageRes = "Lo sentimos pero ya existe un usuario con la misma infomacion.";
             } else if (error.sqlMessage.includes("email")) {
                 messageRes = "Lo sentimos pero el correo ya está en uso por otro usuario.";
-            }  else {
-                messageRes = "Error al registrar el usuario.";
             }
         } else if (error.code === 'ER_NO_REFERENCED_ROW_2') {
             if (error.sqlMessage.includes("fk_sucursal_id")) {
@@ -152,9 +150,7 @@ export const registrarUsuario = async (req, res) => {
                 messageRes = "Lo sentimos, pero el departamento seleccionado no existe.";
             } else if (error.sqlMessage.includes("fk_perfil_id")) {
                 messageRes = "Lo sentimos, pero el perfil seleccionado no existe.";
-            }  else {
-                messageRes = "Error al registrar el usuario.";
-            }        
+            }     
         } 
     }
 
