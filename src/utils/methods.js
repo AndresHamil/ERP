@@ -81,11 +81,11 @@ export const validarTipoDato = (campo, prefijo, valor, tipo) => {
 };
 // ------------------------------------------------------- [LIMPIAR CONTENIDO]
 export const limpiarEspacios = (string) => {
-    return string ? string.trim() : null;
+    return string != null ? string.trim() : null;
 };
 // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
 export const capitalizarString = (string) => {
-    if (!string) {
+    if (string == null) {
         return; 
     }
 

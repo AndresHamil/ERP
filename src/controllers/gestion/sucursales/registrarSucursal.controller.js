@@ -36,6 +36,7 @@ export const registrarSucursal = async (req, res) => {
             INSERT INTO ${tableDb} (nombre, descripcion) 
             VALUES (?, ?)
         `;
+
         const paramsInsercion = [nombre, descripcion];
 
         let [result] = await pool.query(queryInsercion, paramsInsercion);
@@ -53,6 +54,7 @@ export const registrarSucursal = async (req, res) => {
             FROM ${tableDb}
             WHERE sucursales.id = ?
         `;
+
         const paramsSeleccion = [id];
 
         [result] = await pool.query(querySeleccion, paramsSeleccion);
@@ -69,6 +71,7 @@ export const registrarSucursal = async (req, res) => {
         });
 
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;

@@ -2,17 +2,14 @@ import { pool } from "../../../db.js";
 import * as methods from "../../../utils/methods.js";
 
 export const editarDepartamento = async (req, res) => {
-    const { id, nombre, descripcion, estado } = req.body;
-    const tableDb = "departamentos";
+    let { 
+        id = null, 
+        nombre = null, 
+        descripcion = null, 
+        estado = null
+    } = req.body ?? {};
 
-    if (!id) {
-        return res.status(400).json({
-            success: false,
-            message: "Se requiere un ID.",
-            error: null,
-            data: null,
-        });
-    }
+    const tableDb = "departamentos";
 
     let successRes = true,
         messageRes = "Edición exitosa",
@@ -20,17 +17,33 @@ export const editarDepartamento = async (req, res) => {
         dataRes = null;
 
     try {
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        methods.validarTipoDato(descripcion, "La", "descripcion", "string");
+        methods.validarTipoDato(estado, "El", "estado", "bool");
+        // ------------------------------------------------------- [VALIDAR CONTENIDO]
+        methods.validarRequeridoEdicion(nombre, "El", "nombre");
+        // ------------------------------------------------------- [VALIDAR TIPO CONTENIDO]
+        methods.validarContenidoString(nombre, "El", "nombre");
+        // // ------------------------------------------------------- [LIMPIAR CONTENIDO]
+        nombre = methods.limpiarEspacios(nombre);
+        descripcion = methods.limpiarEspacios(descripcion);
+        // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
+        nombre = methods.capitalizarString(nombre);
+        descripcion = methods.capitalizarString(descripcion);
+        // ------------------------------------------------------- [ACTUALIZAR REGISTRO]
         const queryActualizacion = `
             UPDATE ${tableDb} 
             SET 
                 nombre = CASE 
-                    WHEN ? IS NULL THEN nombre 
-                    ELSE ? 
+                    WHEN ? IS NULL THEN nombre  
+                    WHEN ? = '' THEN nombre 
+                    ELSE ?  
                 END,
                 descripcion = CASE 
                     WHEN ? IS NULL THEN descripcion 
                     WHEN ? = '' THEN NULL 
-                    ELSE ? 
+                    ELSE ?   
                 END,
                 estado = CASE 
                     WHEN ? IS NULL THEN estado 
@@ -39,14 +52,14 @@ export const editarDepartamento = async (req, res) => {
             WHERE id = ?
         `;
         const queryParamsActualizacion = [
-            nombre, nombre, // Para nombre
-            descripcion, descripcion, descripcion, // Para descripcion
-            estado, estado, // Para estado
+            nombre, nombre, nombre,
+            descripcion, descripcion, descripcion,
+            estado, estado, 
             id
         ];
 
         const [result] = await pool.query(queryActualizacion, queryParamsActualizacion);
-
+        // ------------------------------------------------------- [SELECCIONAR REGISTRO ACTUALIZADO]
         if (result.affectedRows) {
             const querySeleccion = `
                 SELECT  
@@ -80,22 +93,26 @@ export const editarDepartamento = async (req, res) => {
             errorRes = `No record found for id '${id}' in table '${tableDb}'.`;
         }
     } catch (error) {
-        successRes = false;
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
+        successRes = false
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
 
-        if (error.code === 'ER_DUP_ENTRY') {
-            messageRes = "Ya existe un departamento con el mismo nombre.";
-        } else if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-            messageRes = "El departamento no existe";
-        } else {
-            messageRes = "Error en el servidor";
+        if (error.customMessage) {
+            messageRes = error.customMessage; 
+        } else if (error.code === 'ER_DUP_ENTRY') {
+            if (error.sqlMessage.includes("departamentos.nombre")) {
+                messageRes = "Ya existe un departamento con el mismo nombre.";
+            }
         }
     }
-
-    res.json({
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-    });
+    };
+
+    res.json(response);
 };

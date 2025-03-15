@@ -4,7 +4,6 @@ import * as methods from "../../../utils/methods.js";
 export const consultarSucursales = async (req, res) => {
     const tableDb = "sucursales"; 
 
-
     let successRes = true,
         messageRes = "Consulta exitosa",
         errorRes = null,

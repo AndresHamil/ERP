@@ -1,7 +1,10 @@
 import { pool } from "../../../db.js";
+import * as methods from "../../../utils/methods.js";
 
 export const consultarDepartamentosFormulario = async (req, res) => {
-    const { nombre } = req.body;
+    let { 
+        nombre = null 
+    } = req.body ?? {};
 
     const tableDb = "departamentos";
 
@@ -11,21 +14,28 @@ export const consultarDepartamentosFormulario = async (req, res) => {
         dataRes = null;
 
     try {
-        // Construir la consulta con la condición de estado
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        // ------------------------------------------------------- [LIMPIAR CONTENIDO]
+        nombre = methods.limpiarEspacios(nombre);
+
         let query = `
             SELECT 
                 departamentos.id,
                 departamentos.nombre
             FROM ${tableDb}
-            WHERE departamentos.estado = 1
         `;
+
         const queryParams = [];
+        const conditions = [];
 
         if (nombre) {
-            query += ` AND departamentos.nombre LIKE ?`;
-            queryParams.push(`%${nombre}%`);
+            conditions.push(`(departamentos.nombre LIKE ?)`);
+            queryParams.push(`%${nombre}%`, `%${nombre}%`);
         }
 
+        conditions.push(`departamentos.estado = 1`);
+        query += ` WHERE ` + conditions.join(" AND ");
         query += ` ORDER BY departamentos.nombre ASC LIMIT 20`;
 
         const [result] = await pool.query(query, queryParams);
@@ -41,16 +51,22 @@ export const consultarDepartamentosFormulario = async (req, res) => {
             });
         }
     } catch (error) {
-        successRes = false;
-        messageRes = "Error en el servidor";
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
+        successRes = false
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
-    }
 
+        if (error.customMessage) {
+            messageRes = error.customMessage;       
+        } 
+    }
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
     };
+
     res.json(response);
 };

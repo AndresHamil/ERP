@@ -2,7 +2,10 @@ import { pool } from "../../../db.js";
 import * as methods from "../../../utils/methods.js";
 
 export const registrarDepartamento = async (req, res) => {
-    const { nombre, descripcion } = req.body;
+    let { 
+        nombre = null, 
+        descripcion = null 
+    } = req.body ?? {};
 
     const tableDb = "departamentos";
 
@@ -12,16 +15,33 @@ export const registrarDepartamento = async (req, res) => {
         dataRes = null;
 
     try {
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        methods.validarTipoDato(descripcion, "La", "descripcion", "string");
+        // ------------------------------------------------------- [VALIDAR CONTENIDO]
+        methods.validarRequerido(nombre, "El", "nombre");
+        // ------------------------------------------------------- [VALIDAR TIPO CONTENIDO]
+        methods.validarContenidoString(nombre, "El", "nombre");
+        // ------------------------------------------------------- [LIMPIAR CONTENIDO]
+        nombre = methods.limpiarEspacios(nombre);
+        descripcion = methods.limpiarEspacios(descripcion);
+        // ------------------------------------------------------- [VALIDAR LONGITUD CONTENIDO]
+        methods.validarLongitudString(nombre, "El", "nombre", 50);
+        methods.validarLongitudString(descripcion, "La", "descripcion", 200);
+        // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
+        nombre = methods.capitalizarString(nombre);
+        descripcion = methods.capitalizarString(descripcion);
+
         const queryInsercion = `
-            INSERT INTO ${tableDb}(nombre, descripcion) 
+            INSERT INTO ${tableDb} (nombre, descripcion) 
             VALUES (?, ?)
         `;
-        const queryParamsInsercion = [nombre,descripcion];
 
-        let [result] = await pool.query(queryInsercion, queryParamsInsercion);
+        const paramsInsercion = [nombre, descripcion];
+
+        let [result] = await pool.query(queryInsercion, paramsInsercion);
 
         const id = result.insertId;
-
 
         const querySeleccion = `
             SELECT 
@@ -34,10 +54,10 @@ export const registrarDepartamento = async (req, res) => {
             FROM ${tableDb} 
             WHERE departamentos.id = ?
         `;
-        const queryParamsSeleccion = [id];
 
-        [result] = await pool.query(querySeleccion, queryParamsSeleccion);
+        const paramsSeleccion = [id];
 
+        [result] = await pool.query(querySeleccion, paramsSeleccion);
 
         dataRes = result.map((departamento) => {
             return {
@@ -51,22 +71,26 @@ export const registrarDepartamento = async (req, res) => {
         });
 
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
+        messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
-        dataRes = null;
-        if (error.code === 'ER_DUP_ENTRY') {
-            messageRes = "El departamento ya existe";
-        } else {
-            messageRes = "Error en el servidor";
+
+        if (error.customMessage) {
+            messageRes = error.customMessage; 
+        } else if (error.code === 'ER_DUP_ENTRY') {
+            if (error.sqlMessage.includes("sucursales.nombre")) {
+                messageRes = "Ya existe unsa sucursal con el mismo nombre.";
+            } 
         }
     }
-
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
-        message: messageRes,
-        error: errorRes,
+        message: messageRes, 
+        error: errorRes, 
         data: dataRes,
     };
-
+    
     res.json(response);
 };

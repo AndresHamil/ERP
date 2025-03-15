@@ -21,8 +21,24 @@ INSERT INTO sucursales (nombre, descripcion)
         'Gomez palacio', 
         'Codigo postal 35000'
     );
-
-
+----------------------------------------------------------------------------------------------------------------------- [ DEPARTAMENTOS TABLA ]
+CREATE TABLE departamentos (
+    id INT AUTO_INCREMENT PRIMARY KEY,  
+    nombre VARCHAR(50) NOT NULL, 
+    descripcion VARCHAR(200),
+    estado BOOLEAN DEFAULT TRUE,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    fecha_actualizacion TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+    UNIQUE (nombre)
+);
+INSERT INTO departamentos (nombre, descripcion) 
+    VALUES (
+        'Sistemas', 
+        'Departamento para el desarrollo de productos digitales.'
+    ),(
+        'Recursos humanos', 
+        'Departamento para la gestion corporativa.'
+    );
 
 
 

@@ -3,6 +3,7 @@ import * as methods from "../../../utils/methods.js";
 
 export const eliminarSucursal = async (req, res) => {
     const { id } = req.body;
+
     const tableDb = "sucursales";
 
     let successRes = true,

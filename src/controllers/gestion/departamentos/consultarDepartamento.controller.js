@@ -4,22 +4,18 @@ import * as methods from "../../../utils/methods.js";
 export const consultarDepartamento = async (req, res) => {
     const { id } = req.body;
     const tableDb = "departamentos";
-
+    
     let successRes = true,
         messageRes = "Consulta exitosa",
         errorRes = null,
         dataRes = null;
 
-    if (!id) {
-        return res.status(400).json({
-            success: false,
-            message: "Se requiere un ID.",
-            error: "ID field is missing in the request.",
-            data: null,
-        });
-    }
-
     try {
+        // ------------------------------------------------------- [VALIDAR CONTENIDO]
+        methods.validarRequerido(id, "El", "id");
+        // ------------------------------------------------------- [VALIDAR TIPO DATO]
+        methods.validarTipoDato(id, "El", "id", "int");
+
         const queryConsulta = `
             SELECT 
                 departamentos.id,
@@ -50,16 +46,21 @@ export const consultarDepartamento = async (req, res) => {
             });
         }
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
-        errorRes = error.message;
         messageRes = "Ocurrió un error en el servidor";
-        console.error("Error al consultar perfil:", error);
+        errorRes = error.message;
+        if (error.customMessage) {
+            messageRes = error.customMessage; 
+        }
     }
-
-    res.json({
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-    });
+    };
+
+    res.json(response);
 };

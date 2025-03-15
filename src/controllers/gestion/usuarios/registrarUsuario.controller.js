@@ -130,6 +130,7 @@ export const registrarUsuario = async (req, res) => {
         });
 
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;

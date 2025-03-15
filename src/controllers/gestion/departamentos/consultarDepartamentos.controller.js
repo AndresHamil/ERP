@@ -8,7 +8,7 @@ export const consultarDepartamentos = async (req, res) => {
         messageRes = "Consulta exitosa",
         errorRes = null,
         dataRes = null,
-        totalCount = 0;
+        totalCountRes = 0;
 
     try {
         const [result] = await pool.query(`
@@ -41,22 +41,23 @@ export const consultarDepartamentos = async (req, res) => {
         }
 
         const [[{ totalCount: count }]] = await pool.query(`SELECT COUNT(*) AS totalCount FROM ${tableDb};`);
-        totalCount = count;
+        
+        totalCountRes = count;
 
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Ocurrió un error en el servidor",
-            error: error.message,
-            data: null,
-        });
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
+        successRes = false
+        messageRes = "Ocurrió un error en el servidor";
+        errorRes = error.message;
     }
-
-    res.json({
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-        totalCount: totalCount,
-    });
+        totalCount: totalCountRes
+    };
+
+    res.json(response);
 };
