@@ -61,7 +61,6 @@ export const editarUsuario = async (req, res) => {
         // ------------------------------------------------------- [HASH PASSWORD]
         password = await methods.generarHash(password);
         // ------------------------------------------------------- [ACTUALIZAR REGISTRO]
-
         const queryActualizacion = `
             UPDATE ${tableDb} 
             SET 
@@ -86,7 +85,7 @@ export const editarUsuario = async (req, res) => {
                     ELSE ?   
                 END,
                 telefono = CASE 
-                    WHEN ? IS NULL THEN ? 
+                    WHEN ? IS NULL THEN telefono 
                     WHEN ? = '' THEN NULL 
                     ELSE ? 
                 END,
@@ -125,7 +124,7 @@ export const editarUsuario = async (req, res) => {
             apellido, apellido, apellido,
             usuario, usuario, usuario,
             email, email, email,
-            telefono, telefono, telefono, telefono,
+            telefono, telefono, telefono,
             password, password, password,
             fkSucursalId, fkSucursalId, fkSucursalId,
             fkDepartamentoId, fkDepartamentoId, fkDepartamentoId,
@@ -137,7 +136,6 @@ export const editarUsuario = async (req, res) => {
         const [result] = await pool.query(queryActualizacion, queryParamsActualizacion);
         // ------------------------------------------------------- [SELECCIONAR REGISTRO ACTUALIZADO]
         if (result.affectedRows) {
-
             const queryConsulta = `
                 SELECT 
                     usuarios.id,
@@ -197,6 +195,7 @@ export const editarUsuario = async (req, res) => {
             errorRes = `No record found for id '${id}' in table '${tableDb}'.`;
         }
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
@@ -220,7 +219,7 @@ export const editarUsuario = async (req, res) => {
             }    
         } 
     }
-
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
         message: messageRes,

@@ -1,43 +1,57 @@
 ----------------------------------------------------------------------------------------------------------------------- [ BUILD ]
+DROP DATABASE empresa;
 CREATE DATABASE  IF NOT EXISTS empresa;
 USE empresa;
 SHOW tables;
-DROP DATABASE empresa;
------------------------------------------------------------------------------------------------------------------------ [ USUARIOS TABLA ]
-CREATE TABLE usuarios (
+----------------------------------------------------------------------------------------------------------------------- [ SUCURSALES TABLA ]
+CREATE TABLE sucursales (
     id INT AUTO_INCREMENT PRIMARY KEY,  
     nombre VARCHAR(50) NOT NULL, 
-    usuario VARCHAR(50) NOT NULL UNIQUE, 
-    password VARCHAR(255) NOT NULL, 
-    fk_perfil_id INT NOT NULL,
-    estado BOOLEAN DEFAULT TRUE, 
-    sesion BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (fk_perfil_id) REFERENCES perfiles(id) ON DELETE CASCADE ON UPDATE CASCADE
+    descripcion VARCHAR(200),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    fecha_actualizacion TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+    estado BOOLEAN DEFAULT TRUE,
+    UNIQUE (nombre)
 );
------------------------------------------------------------------------------------------------------------------------ [ USUARIOS FUNSIONES ]
-DESCRIBE usuarios;
-DROP TABLE usuarios;
-TRUNCATE TABLE usuarios;
------------------------------------------------------------------------------------------------------------------------ [ USUARIOS INTERACTUAR ]
-INSERT INTO usuarios(
-	nombre,
-	usuario, 
-    password,
-    fk_perfil_id
-) VALUES (
-	'Luis Andres',
-	'larcword', 
-    '12345678',
-    1
-);
+INSERT INTO sucursales (nombre, descripcion) 
+    VALUES (
+        'Torreón', 
+        'Codigo postal 36000'
+    ),(
+        'Gomez palacio', 
+        'Codigo postal 35000'
+    );
 
-SELECT 
-	usuarios.id,
-    usuarios.nombre, 
-    usuarios.usuario, 
-    perfiles.nombre AS perfil
-FROM usuarios JOIN perfiles 
-ON usuarios.fk_perfil_id = perfiles.id;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ----------------------------------------------------------------------------------------------------------------------- [ PERFILES TABLA ]
 CREATE TABLE perfiles (
     id INT AUTO_INCREMENT PRIMARY KEY,  

@@ -81,7 +81,7 @@ export const registrarSucursal = async (req, res) => {
             } 
         }
     }
-
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
         message: messageRes, 

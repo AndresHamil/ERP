@@ -12,9 +12,9 @@ export const consultarUsuario = async (req, res) => {
 
     try {
         // ------------------------------------------------------- [VALIDAR CONTENIDO]
-        methods.validarRequerido(id, "El id es requerido", "id");
+        methods.validarRequerido(id, "El", "id");
         // ------------------------------------------------------- [VALIDAR TIPO DATO]
-        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
+        methods.validarTipoDato(id, "El", "id", "int");
 
         const queryConsulta = `
             SELECT 
@@ -73,6 +73,7 @@ export const consultarUsuario = async (req, res) => {
             });
         }
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
@@ -80,11 +81,13 @@ export const consultarUsuario = async (req, res) => {
             messageRes = error.customMessage; 
         }
     }
-
-    res.json({
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-    });
+    };
+    
+    res.json(response);
 };

@@ -22,12 +22,12 @@ export const consultarSucursalesFiltros = async (req, res) => {
 
     try {
         // ------------------------------------------------------- [VALIDAR TIPO DATO]
-        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
-        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
-        methods.validarTipoDato(descripcion, "La descripcion no tiene el formato adecuado", "descripcion", "string");
-        methods.validarTipoDato(fechaRegistro, "La fechaRegistro no tiene el formato adecuado", "fechaRegistro", "string");
-        methods.validarTipoDato(fechaActualizacion, "La fechaActualizacion no tiene el formato adecuado", "fechaActualizacion", "string");
-        methods.validarTipoDato(estado, "El estado no tiene el formato adecuado", "estado", "bool");
+        methods.validarTipoDato(id, "El", "id", "int");
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        methods.validarTipoDato(descripcion, "La", "descripcion", "string");
+        methods.validarTipoDato(fechaRegistro, "La", "fechaRegistro", "string");
+        methods.validarTipoDato(fechaActualizacion, "La", "fechaActualizacion", "string");
+        methods.validarTipoDato(estado, "El", "estado", "bool");
         // ------------------------------------------------------- [LIMPIAR CONTENIDO]
         nombre = methods.limpiarEspacios(nombre);
         descripcion = methods.limpiarEspacios(descripcion);
@@ -100,6 +100,7 @@ export const consultarSucursalesFiltros = async (req, res) => {
         totalCountRes = count;
         
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
@@ -108,7 +109,7 @@ export const consultarSucursalesFiltros = async (req, res) => {
             messageRes = error.customMessage;       
         } 
     }
-
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
         message: messageRes,

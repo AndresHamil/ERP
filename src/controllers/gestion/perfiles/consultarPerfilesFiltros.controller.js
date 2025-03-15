@@ -41,7 +41,6 @@ export const consultarPerfilesFiltros = async (req, res) => {
 
         query += ` ORDER BY perfiles.nombre ASC LIMIT 20`;
 
-        console.log(query);
 
         const [result] = await pool.query(query, queryParams);
 

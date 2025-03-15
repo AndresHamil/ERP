@@ -44,7 +44,6 @@ export const consultarProcesosFiltros = async (req, res) => {
 
         query += ` ORDER BY procesos.nombre ASC LIMIT 20`;
 
-        console.log(query);
 
         const [result] = await pool.query(query, queryParams);
 

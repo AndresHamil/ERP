@@ -11,23 +11,20 @@ export const eliminarUsuario = async (req, res) => {
         dataRes = null;
 
     try {
-
         // ------------------------------------------------------- [VALIDAR CONTENIDO]
-        methods.validarRequerido(id, "El id es requerido", "id");
+        methods.validarRequerido(id, "El", "id");
         // ------------------------------------------------------- [VALIDAR TIPO DATO]
-        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
-
-        const [result] = await pool.query(
-            `DELETE FROM ${tableDb} WHERE id = ?`,
-            [id]
-        );
-
+        methods.validarTipoDato(id, "El", "id", "int");
+        // ------------------------------------------------------- [ELIMINAR REGISTRO]
+        const [result] = await pool.query(`DELETE FROM ${tableDb} WHERE id = ?`,[id]);
+        // ------------------------------------------------------- [VALIDA SI AFECTO REGISTRO]
         if (!result.affectedRows) {
             successRes = false;
             messageRes = `No se encontró el usuario con ID '${id}'.`;
             errorRes = `No record found for ID '${id}' in table '${tableDb}'.`;
         }
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
@@ -39,11 +36,13 @@ export const eliminarUsuario = async (req, res) => {
             messageRes ="No se puede eliminar este usuario porque tiene registros dependientes.";
         }
     }
-
-    res.json({
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-    });
+    };
+    
+    res.json(response);
 };

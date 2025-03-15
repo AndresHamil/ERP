@@ -52,8 +52,10 @@ END;
 -- EDITAR TODOS LOS CAMPOS DE UN REGISTRO POR ID
 BEGIN
     UPDATE sucursales SET 
-        id = 2
-    WHERE id = 5;       
+        sucursales.nombre = "Lerdoo",
+        sucursales.descripcion = "Codigo postal 35000",
+        sucursales.estado = false
+    WHERE sucursales.id = 3;       
 END;
 -- ELIMINAR UN REGISTRO POR ID
 BEGIN

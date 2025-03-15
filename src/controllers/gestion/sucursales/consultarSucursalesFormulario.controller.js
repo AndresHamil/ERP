@@ -15,7 +15,7 @@ export const consultarSucursalesFormulario = async (req, res) => {
 
     try {
         // ------------------------------------------------------- [VALIDAR TIPO DATO]
-        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
         // ------------------------------------------------------- [LIMPIAR CONTENIDO]
         nombre = methods.limpiarEspacios(nombre);
 
@@ -51,6 +51,7 @@ export const consultarSucursalesFormulario = async (req, res) => {
             });
         }
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
@@ -59,7 +60,7 @@ export const consultarSucursalesFormulario = async (req, res) => {
             messageRes = error.customMessage;       
         } 
     }
-
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
         message: messageRes,

@@ -66,16 +66,19 @@ export const consultarUsuarios = async (req, res) => {
         totalCountRes = count;
 
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
     }
-
-    res.json({
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
         totalCount: totalCountRes
-    });
+    };
+    
+    res.json(response);
 };

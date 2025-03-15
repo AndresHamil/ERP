@@ -18,10 +18,10 @@ export const consultarUsuariosFormulario = async (req, res) => {
 
     try {
         // ------------------------------------------------------- [VALIDAR TIPO DATO]
-        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
-        methods.validarTipoDato(fkSucursalId, "El fkSucursalId no tiene el formato adecuado", "fkSucursalId", "int");
-        methods.validarTipoDato(fkDepartamentoId, "El fkDepartamentoId no tiene el formato adecuado", "fkDepartamentoId", "int");
-        methods.validarTipoDato(fkPerfilId, "El fkPerfilId no tiene el formato adecuado", "fkPerfilId", "int");
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        methods.validarTipoDato(fkSucursalId, "El", "fkSucursalId", "int");
+        methods.validarTipoDato(fkDepartamentoId, "El", "fkDepartamentoId", "int");
+        methods.validarTipoDato(fkPerfilId, "El", "fkPerfilId", "int");
         // ------------------------------------------------------- [LIMPIAR CONTENIDO]
         nombre = methods.limpiarEspacios(nombre);
 
@@ -89,6 +89,7 @@ export const consultarUsuariosFormulario = async (req, res) => {
         }
         
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
@@ -97,7 +98,7 @@ export const consultarUsuariosFormulario = async (req, res) => {
             messageRes = error.customMessage;       
         } 
     }
-
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
         message: messageRes,

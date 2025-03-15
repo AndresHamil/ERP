@@ -34,9 +34,6 @@ export const registrarModulo = async (req, res) => {
 
 
 
-
-        console.log(result);
-
         // Si la consulta de selección es exitosa, asignamos el resultado
         dataRes = result;
 

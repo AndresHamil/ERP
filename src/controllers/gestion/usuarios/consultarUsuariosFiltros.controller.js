@@ -32,22 +32,22 @@ export const consultarUsuariosFiltros = async (req, res) => {
 
     try {
         // ------------------------------------------------------- [VALIDAR TIPO DATO]
-        methods.validarTipoDato(id, "El id no tiene el formato adecuado", "id", "int");
-        methods.validarTipoDato(nombre, "El nombre no tiene el formato adecuado", "nombre", "string");
-        methods.validarTipoDato(apellido, "El apellido no tiene el formato adecuado", "apellido", "string");
-        methods.validarTipoDato(usuario, "El usuario no tiene el formato adecuado", "usuario", "string");
-        methods.validarTipoDato(email, "El email no tiene el formato adecuado", "email", "string");
-        methods.validarTipoDato(telefono, "El telefono no tiene el formato adecuado", "telefono", "string");
-        methods.validarTipoDato(sucursal, "La sucursal no tiene el formato adecuado", "sucursal", "string");
-        methods.validarTipoDato(fkSucursalId, "El fkSucursalId no tiene el formato adecuado", "fkSucursalId", "int");
-        methods.validarTipoDato(departamento, "El departamento no tiene el formato adecuado", "departamento", "string");
-        methods.validarTipoDato(fkDepartamentoId, "El fkDepartamentoId no tiene el formato adecuado", "fkDepartamentoId", "int");
-        methods.validarTipoDato(perfil, "El perfil no tiene el formato adecuado", "perfil", "string");
-        methods.validarTipoDato(fkPerfilId, "El fkPerfilId no tiene el formato adecuado", "fkPerfilId", "int");
-        methods.validarTipoDato(fechaRegistro, "La fechaRegistro no tiene el formato adecuado", "fechaRegistro", "string");
-        methods.validarTipoDato(fechaActualizacion, "La fechaActualizacion no tiene el formato adecuado", "fechaActualizacion", "string");
-        methods.validarTipoDato(estado, "El estado no tiene el formato adecuado", "estado", "bool");
-        methods.validarTipoDato(sesion, "El sesion no tiene el formato adecuado", "sesion", "bool");
+        methods.validarTipoDato(id, "El", "id", "int");
+        methods.validarTipoDato(nombre, "El", "nombre", "string");
+        methods.validarTipoDato(apellido, "El", "apellido", "string");
+        methods.validarTipoDato(usuario, "El", "usuario", "string");
+        methods.validarTipoDato(email, "El", "email", "string");
+        methods.validarTipoDato(telefono, "El", "telefono", "string");
+        methods.validarTipoDato(sucursal, "La", "sucursal", "string");
+        methods.validarTipoDato(fkSucursalId, "El", "fkSucursalId", "int");
+        methods.validarTipoDato(departamento, "El", "departamento", "string");
+        methods.validarTipoDato(fkDepartamentoId, "El", "fkDepartamentoId", "int");
+        methods.validarTipoDato(perfil, "El", "perfil", "string");
+        methods.validarTipoDato(fkPerfilId, "El", "fkPerfilId", "int");
+        methods.validarTipoDato(fechaRegistro, "La", "fechaRegistro", "string");
+        methods.validarTipoDato(fechaActualizacion, "La", "fechaActualizacion", "string");
+        methods.validarTipoDato(estado, "El", "estado", "bool");
+        methods.validarTipoDato(sesion, "La", "sesion", "bool");
         // ------------------------------------------------------- [LIMPIAR CONTENIDO]
         nombre = methods.limpiarEspacios(nombre);
         apellido = methods.limpiarEspacios(apellido);
@@ -186,6 +186,7 @@ export const consultarUsuariosFiltros = async (req, res) => {
         totalCountRes = count;
         
     } catch (error) {
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
         successRes = false;
         messageRes = "Ocurrió un error en el servidor";
         errorRes = error.message;
@@ -194,7 +195,7 @@ export const consultarUsuariosFiltros = async (req, res) => {
             messageRes = error.customMessage;       
         } 
     }
-
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
     const response = {
         success: successRes,
         message: messageRes,
