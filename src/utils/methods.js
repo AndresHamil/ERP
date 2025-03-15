@@ -166,8 +166,3 @@ export const generarUsuarioEdicion = async (id, nombre, apellido) => {
         }
     }
 };
-
-
-
-
-
