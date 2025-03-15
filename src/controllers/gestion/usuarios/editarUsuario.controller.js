@@ -3,7 +3,6 @@ import * as methods from "../../../utils/methods.js";
 
 
 export const editarUsuario = async (req, res) => {
-
     let { 
         id = null, 
         nombre, 
