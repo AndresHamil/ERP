@@ -1,20 +1,23 @@
 import { pool } from "../../../db.js";
+import * as methods from "../../../utils/methods.js";
 
 export const consultarPerfiles = async (req, res) => {
-    const tableDb = "perfiles";
+    const tableDb = "perfiles"; 
 
     let successRes = true,
         messageRes = "Consulta exitosa",
         errorRes = null,
         dataRes = null,
-        totalCount = 0;
+        totalCountRes = 0;
 
     try {
-        const [dataResult] = await pool.query(`
+        const [result] = await pool.query(`
             SELECT 
                 perfiles.id,
                 perfiles.nombre,
                 perfiles.descripcion,
+                perfiles.fecha_registro AS fechaRegistro,
+                perfiles.fecha_actualizacion AS fechaActualizacion,
                 perfiles.estado
             FROM 
                 ${tableDb}
@@ -22,25 +25,39 @@ export const consultarPerfiles = async (req, res) => {
             LIMIT 20;
         `);
 
-        dataRes = dataResult.length ? dataResult : null;
+        if (result.length === 0) {
+            messageRes = "No se encontraron registros";
+        } else {
+            dataRes = result.map((perfil) => {
+                return {
+                    id: perfil.id,
+                    nombre: perfil.nombre,
+                    descripcion: perfil.descripcion,
+                    fechaRegistro: methods.formatearFecha(perfil.fechaRegistro),
+                    fechaActualizacion: methods.formatearFecha(perfil.fechaActualizacion),
+                    estado: perfil.estado === 1 ? true : false                
+                };
+            });
+        }
 
         const [[{ totalCount: count }]] = await pool.query(`SELECT COUNT(*) AS totalCount FROM ${tableDb};`);
-        totalCount = count;
+        
+        totalCountRes = count;
 
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Ocurrió un error en el servidor",
-            error: error.message,
-            data: null,
-        });
+        // ------------------------------------------------------- [CAPTURAR ERRORES]
+        successRes = false
+        messageRes = "Ocurrió un error en el servidor";
+        errorRes = error.message;
     }
-
-    res.json({
+    // ------------------------------------------------------- [RESPUESTA DEL SERIVODR]
+    const response = {
         success: successRes,
         message: messageRes,
         error: errorRes,
         data: dataRes,
-        totalCount: totalCount,
-    });
+        totalCount: totalCountRes
+    };
+
+    res.json(response);
 };

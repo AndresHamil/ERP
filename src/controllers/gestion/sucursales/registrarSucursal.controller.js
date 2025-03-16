@@ -29,8 +29,8 @@ export const registrarSucursal = async (req, res) => {
         methods.validarLongitudString(nombre, "El", "nombre", 50);
         methods.validarLongitudString(descripcion, "La", "descripcion", 200);
         // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
-        nombre = methods.capitalizarString(nombre);
-        descripcion = methods.capitalizarString(descripcion);
+        nombre = methods.capitalizarTexto(nombre);
+        descripcion = methods.capitalizarTexto(descripcion);
 
         const queryInsercion = `
             INSERT INTO ${tableDb} (nombre, descripcion) 

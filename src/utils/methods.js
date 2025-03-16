@@ -84,12 +84,19 @@ export const limpiarEspacios = (string) => {
     return string != null ? string.trim() : null;
 };
 // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
-export const capitalizarString = (string) => {
+export const capitalizarNombre = (string) => {
     if (string == null) {
         return; 
     }
 
     return string.split(" ") .map((palabra) => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase()).join(" ");
+};
+export const capitalizarTexto = (string) => {
+    if (string == null) {
+        return; 
+    }
+
+    return string.charAt(0).toUpperCase() + string.slice(1);
 };
 // ------------------------------------------------------- [FORMATEAR CONTENIDO]
 export const formatearFecha = (fecha) => {

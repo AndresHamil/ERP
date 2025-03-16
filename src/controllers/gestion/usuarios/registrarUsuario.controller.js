@@ -57,8 +57,8 @@ export const registrarUsuario = async (req, res) => {
         methods.validarFormatoEmail(email);
         methods.validarFormatoTelefono(telefono);
         // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
-        nombre = methods.capitalizarString(nombre);
-        apellido = methods.capitalizarString(apellido);
+        nombre = methods.capitalizarTexto(nombre);
+        apellido = methods.capitalizarTexto(apellido);
         // ------------------------------------------------------- [GENERAR USUARIO]
         const usuario = methods.generarUsuario(nombre, apellido);
         // ------------------------------------------------------- [HASH PASSWORD]

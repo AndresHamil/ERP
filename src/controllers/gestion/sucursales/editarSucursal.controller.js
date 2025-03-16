@@ -29,8 +29,8 @@ export const editarSucursal = async (req, res) => {
         nombre = methods.limpiarEspacios(nombre);
         descripcion = methods.limpiarEspacios(descripcion);
         // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
-        nombre = methods.capitalizarString(nombre);
-        descripcion = methods.capitalizarString(descripcion);
+        nombre = methods.capitalizarTexto(nombre);
+        descripcion = methods.capitalizarTexto(descripcion);
         // ------------------------------------------------------- [ACTUALIZAR REGISTRO]
         const queryActualizacion = `
             UPDATE ${tableDb} 

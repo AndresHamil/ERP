@@ -53,8 +53,8 @@ export const editarUsuario = async (req, res) => {
         email = methods.limpiarEspacios(email);
         password = methods.limpiarEspacios(password);
         // ------------------------------------------------------- [CAPITALIZAR CONTENIDO]
-        nombre = methods.capitalizarString(nombre);
-        apellido = methods.capitalizarString(apellido);
+        nombre = methods.capitalizarTexto(nombre);
+        apellido = methods.capitalizarTexto(apellido);
         // ------------------------------------------------------- [GENERAR USUARIO EDICION]
         const usuario = await methods.generarUsuarioEdicion(id, nombre, apellido);
         // ------------------------------------------------------- [HASH PASSWORD]
